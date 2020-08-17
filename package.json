@@ -1,0 +1,17 @@
+{
+  "name": "cypressnew",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "cypress": "^4.11.0"
+  },
+  "test:e2e": "vue-cli-service test:e2e --mode development --headless",
+  "test:e2e-gui": "vue-cli-service test:e2e --mode development"
+}
