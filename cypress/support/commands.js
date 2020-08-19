@@ -12,7 +12,7 @@
 // -- This is a parent command --
 //login by UI
 Cypress.Commands.add("login", (user, password) => {
-    cy.visit('https://qa.siglus.us/#!/login')
+    cy.visit(Cypress.env("baseUrl"))
     cy.get('#login-username').type(user)
     cy.get('#login-password').type(password)
     cy.contains('Sign In').click()
@@ -20,10 +20,17 @@ Cypress.Commands.add("login", (user, password) => {
     cy.get('.home-page > :nth-child(2)').should('contain','Welcome to OpenLMIS Mozambique')
 })
 
+//get ID th element and it contain value
 Cypress.Commands.add('containValueById',(element,id,value) =>{
     cy.get(element)
         .eq(id)
         .should('contain',value)
+})
+
+//logout by UI
+Cypress.Commands.add('logout',() => {
+    cy.get('.navbar-right.ng-binding').click()
+    cy.url().should('include','login')
 })
 
 // login by API
@@ -53,15 +60,14 @@ Cypress.Commands.add('containValueById',(element,id,value) =>{
 //     })
 //
 // })
+// logout by storage
+// Cypress.Commands.add("logout",() => {
+//     cy.window.its('locaStorage')
+//         .invoke('getItem','jwt')
+//         .should('not.exist')
+// })
 
-Cypress.Commands.add("logout",() => {
-    cy.window.its('locaStorage')
-        .invoke('getItem','jwt')
-        .should('not.exist')
-})
 
-//
-//
 // -- This is a child command --
 // Cypress.Commands.add("drag", { prevSubject: 'element'}, (subject, options) => { ... })
 //
