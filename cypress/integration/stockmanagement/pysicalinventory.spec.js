@@ -3,6 +3,10 @@ describe('physical inventory',() => {
         cy.login(Cypress.env("username"),Cypress.env("password"))
     })
 
+    afterEach(() => {
+        cy.logout()
+    })
+
     it('check  Physical inventory entrance',() => {
 
         cy.get(':nth-child(4) > [bs-dropdown="dropdown"]').click().then(() => {
