@@ -19,7 +19,7 @@ pipeline {
             steps {
                 fetch_cypress_env()
                 withCredentials([string(credentialsId: 'cypress_key', variable: 'CYPRESS_KEY')]) {
-                    sh 'cypress run --record --key $CYPRESS_KEY'
+                    sh './node_modules/cypress/bin/cypress run --record --key $CYPRESS_KEY'
                 }
             }
         }
