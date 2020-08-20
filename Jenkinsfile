@@ -12,7 +12,7 @@ pipeline {
                 sh 'npm install'
             }
         }
-        stage('Run e2e tests') {
+        stage('Run E2E Tests') {
             when {
                 branch 'master'
             }
@@ -21,6 +21,14 @@ pipeline {
                 withCredentials([string(credentialsId: 'cypress_key', variable: 'CYPRESS_KEY')]) {
                     sh './node_modules/cypress/bin/cypress run --record --key $CYPRESS_KEY'
                 }
+            }
+        }
+        stage('Clear Artifacts') {
+            when {
+                branch 'master'
+            }
+            steps {
+                sh 'rm -rf cypress/screenshots cypress/videos'
             }
         }
     }
