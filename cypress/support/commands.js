@@ -33,6 +33,34 @@ Cypress.Commands.add('logout',() => {
     cy.url().should('include','login')
 })
 
+Cypress.Commands.add('fillCustomInput', (option = {enableInput: false, cb: () => {}}) => {
+    const { enableInput, cb } = option;
+
+    if (enableInput === true) {
+      return;
+    }
+
+    cy.get('.stock-select-container').each((el, index) => {
+        cy.get('.custom-item-container').eq(index).click().wait(1000).then(() => {
+            cy.get('.adjustment-custom-item .option-list').then(element => {
+                // if has lot option, then pick first option
+                if (element.children().length > 0) {
+                    cy.get('body>.adjustment-custom-item .option-list').children().eq(0).click()
+                } else {
+                    cy.get('body>.adjustment-custom-item .auto').first().click()
+                    cy.get('[openlmis-datepicker="openlmis-datepicker"]').eq(index * 2).click().wait(500).then(() => {
+                        cy.get('.datepicker .datepicker-days tbody tr td').eq(index % 7).click()
+                    })
+                }
+            })
+        })
+    })
+
+    if ( cb && typeof cb === "function") {
+        cb()
+    }
+})
+
 // login by API
 // Cypress.Commands.add("login", (user, password) => {
 //     cy.request({

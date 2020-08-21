@@ -12,7 +12,7 @@ describe('physical inventory',() => {
         cy.get(':nth-child(4) > [bs-dropdown="dropdown"]').click().then(() => {
             cy.contains('Unpack').click()
             cy.url().should('contain','stockmanagement/unpack')
-            cy.contains('Kit Unpack for')
+            cy.contains('Kit Unpack for').should('be.visible')
 
             //get KIT AL/US (Artemeter+Lumefantrina); 170 Tratamentos+ 400 Testes; KIT and Unpack
             cy.contains('KIT AL/US (Artemeter+Lumefantrina); 170 Tratamentos+ 400 Testes; KIT')
@@ -33,18 +33,17 @@ describe('physical inventory',() => {
             cy.get(':nth-child(4) > .input-control').type('1')
             cy.get(':nth-child(5) > .input-control').type('doc-01').then( () => {
                 cy.get('tbody > .ng-isolate-scope > :nth-child(6) > .ng-binding').click().then(() => {
-                    cy.contains('Quantity in KIT')
+                    cy.contains('Quantity in KIT').should('be.visible')
 
                     cy.get("div[ng-if='vm.showProducts']")
-                        .find('[ng-repeat="products in vm.groupedProducts"]')
-                        .first().within(() => {
-                            cy.containValueById('td',0,'08O05')
-                            cy.containValueById('td',1,'Artemeter+Lumefantrina; 120mg+20mg 1x6; Comp')
-                            cy.get('td').eq(3).click().then(() => {
-                                //  continue select time
-                            })
+                    .find('[ng-repeat="products in vm.groupedProducts"]')
+                    .first().within(() => {
+                        cy.containValueById('td',0,'08O05')
+                        cy.containValueById('td',1,'Artemeter+Lumefantrina; 120mg+20mg 1x6; Comp')
+
                     })
 
+                    cy.fillCustomInput();
 
                 })
             })
