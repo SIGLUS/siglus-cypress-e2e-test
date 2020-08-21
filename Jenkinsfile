@@ -4,6 +4,15 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '50'))
     }
     stages {
+        stage('Install npm') {
+            when {
+                branch 'master'
+            }
+            steps {'
+                sh 'npm install --unsafe-perm=true --allow-root'
+
+            }
+        }
         stage('Run E2E Tests') {
             when {
                 branch 'master'
