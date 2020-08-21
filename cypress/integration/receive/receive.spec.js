@@ -14,24 +14,8 @@ describe('stockmanagement receive scenario',() => {
 
   it('stockmanagement receive', () => {
     // go to receive products page
-    cy.get(':nth-child(4) > [bs-dropdown="dropdown"]').click().then(() => {
-      cy.get('.open > .ng-isolate-scope > :nth-child(3) > .ng-binding').should('contain', 'Receive').click().then(() => {
-        cy.url().should('contain','stockmanagement/receive')
-        cy.get('.breadcrumb > :nth-child(1) > .ng-binding').should('contain','Home')
-        cy.get('.breadcrumb > :nth-child(2) > .ng-binding').should('contain','Stock Management')
-        cy.get('.breadcrumb > :nth-child(3) > .ng-binding').should('contain','Receive')
-        cy.get('tbody > .ng-isolate-scope > .ng-binding').should('contain', 'All Products')
-        cy.get('#proceedButton').click().wait(10000).then(() => {
-          // clear if draft existed
-          cy.get('.pagination-info').then(element => {
-            if (!element.text().includes('Showing no items')) {
-              cy.get('[ng-click="vm.removeDisplayItems()"]').click().then(() => {
-                cy.get('[ng-click="vm.confirm()"]').click()
-              })
-            }
-          })
-        })
-      })
+    cy.enterMenu(4, 3, 'Receive', 'stockmanagement/receive').then(() => {
+      cy.enterAllProductsClearDraft('Receive');
     })
 
     // add products and fill value
@@ -61,19 +45,7 @@ describe('stockmanagement receive scenario',() => {
           })
         }
       }
-      // fill 'Received From'
-      cy.get(':nth-child(1) > :nth-child(6) > .input-control').click().then(() => {
-        cy.contains('District(DDM)').click({force: true})
-      })
-      // fill 'Quantity'
-      cy.get(':nth-child(1) > :nth-child(7) > .input-control').type(String(index + 1))
-      // fill 'Date'
-      cy.get(':nth-child(1) > :nth-child(8) > .input-control').click().then(()=> {
-        cy.get('.datepicker-days > .table-condensed > tfoot > :nth-child(2) > .clear').click()
-        cy.get(':nth-child(1) > :nth-child(8) > .input-control').type(getYesterday())
-      })
-      // fill 'Documentation No.'
-      cy.get(':nth-child(1) > :nth-child(9) > .input-control').click().type('Doc-' + product)
+      cy.fillCommonData(index + 1, getYesterday(), 'Doc-' + product);
     })
 
     // click 'Save' button
@@ -82,13 +54,10 @@ describe('stockmanagement receive scenario',() => {
     })
 
     // go to receive products page again
-    cy.get(':nth-child(4) > [bs-dropdown="dropdown"]').click().then(() => {
-      cy.get('.open > .ng-isolate-scope > :nth-child(3) > .ng-binding').should('contain', 'Receive').click().then(() => {
-        cy.url().should('contain','stockmanagement/receive')
+    cy.enterMenu(4, 3, 'Receive', 'stockmanagement/receive').then(() => {
         cy.get('#proceedButton').should('have.value', 'Continue').click().wait(10000).then(() => {
           cy.get('.pagination-info').should('contain', 'Showing 4 item(s) out of 4 total')
         })
-      })
     })
 
     // click "Remove' button
@@ -96,17 +65,6 @@ describe('stockmanagement receive scenario',() => {
       cy.get('.pagination-info').should('contain', 'Showing 3 item(s) out of 3 total')
     })
 
-    // click 'Submit' button
-    cy.get('[ng-click="vm.submit()"]').click().then(() => {
-      cy.get('.form-group > .is-required').should('contain', 'Signature')
-      cy.get('[name="vm.signature"]').type('Cypress Robot')
-      cy.get('[ng-click="vm.confirm()"]').click().then(() => {
-        cy.contains('Stock receive event has successfully been submitted')
-        cy.get('.breadcrumb > :nth-child(1) > .ng-binding').should('contain','Home')
-        cy.get('.breadcrumb > :nth-child(2) > .ng-binding').should('contain', 'Stock Management')
-        cy.get('.breadcrumb > :nth-child(3) > .ng-binding').should('contain', 'Stock on Hand')
-      })
-    })
-
+    cy.submitAndShowSoh();
   })
 })
