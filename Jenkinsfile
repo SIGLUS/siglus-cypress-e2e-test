@@ -9,7 +9,7 @@ pipeline {
                 branch 'master'
             }
             steps {
-                sh 'npm install'
+                sh 'npm install --unsafe-perm=true --allow-root'
             }
         }
         stage('Run E2E Tests') {
