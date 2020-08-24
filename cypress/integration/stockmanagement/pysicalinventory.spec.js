@@ -1,11 +1,11 @@
 // E2E test for stockmanagement physical inventory scenario
 
 describe('physical inventory', () => {
-  beforeEach(() => {
+  before(() => {
     cy.login(Cypress.env('username'), Cypress.env('password'))
   })
 
-  afterEach(() => {
+  after(() => {
     cy.logout()
   })
 

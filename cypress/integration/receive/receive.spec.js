@@ -4,11 +4,11 @@ import {getYesterday, getFutureDate} from '../../utils/date-util'
 
 describe('stockmanagement receive scenario', () => {
 
-  beforeEach(() =>{
+  before(() =>{
     cy.login(Cypress.env('username'), Cypress.env('password'))
   })
 
-  afterEach(() => {
+  after(() => {
     cy.logout()
   })
 

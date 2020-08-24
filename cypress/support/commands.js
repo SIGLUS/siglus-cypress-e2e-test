@@ -28,8 +28,9 @@ Cypress.Commands.add('containValueById', (element, id, value) => {
 
 // logout by UI
 Cypress.Commands.add('logout', () => {
-  cy.get('.navbar-right.ng-binding').click()
-  cy.url().should('include', 'login')
+  cy.wait(5000).get('.navbar-right.ng-binding').click({force: true}).then(() => {
+    cy.url().should('include', 'login')
+  })
 })
 
 Cypress.Commands.add('fillCustomInput', (option = {

@@ -8,6 +8,10 @@ describe('stockmanagement issue scenario', () => {
     cy.login(Cypress.env('username'), Cypress.env('password'))
   })
 
+  after(() => {
+    cy.logout()
+  })
+
   it('stockmanagement issue', () => {
     // go to issue page
     cy.enterMenu(4, 2, 'Issue', 'stockmanagement/issue').then(() => {
