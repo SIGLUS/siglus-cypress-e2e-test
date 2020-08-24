@@ -28,4 +28,4 @@ const getFutureDate = () => {
   return formatDate(future)
 }
 
-export { getYesterday, getFutureDate }
+export {getYesterday, getFutureDate}

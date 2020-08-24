@@ -1,21 +1,21 @@
 // E2E test for stockmanagement receive scenario
 
-import { getYesterday, getFutureDate } from '../../utils/date-util'
+import {getYesterday, getFutureDate} from '../../utils/date-util'
 
-describe('stockmanagement receive scenario',() => {
+describe('stockmanagement receive scenario', () => {
 
-  before(() =>{
-    cy.login(Cypress.env("username"),Cypress.env("password"))
+  beforeEach(() =>{
+    cy.login(Cypress.env('username'), Cypress.env('password'))
   })
 
-  after(() => {
+  afterEach(() => {
     cy.logout()
   })
 
   it('stockmanagement receive', () => {
     // go to receive products page
     cy.enterMenu(4, 3, 'Receive', 'stockmanagement/receive').then(() => {
-      cy.enterAllProductsClearDraft('Receive');
+      cy.enterAllProductsClearDraft('Receive')
     })
 
     // add products and fill value
@@ -31,6 +31,7 @@ describe('stockmanagement receive scenario',() => {
       if (product !== KIT) {
         if (product === IBUPROFENO) {
           // fill 'Lot Code', create new lot
+          // eslint-disable-next-line max-len
           cy.get(':nth-child(1) > :nth-child(3) > .stock-select-container > [ng-if="!enableInput"] > .form-control').click().then(() => {
             cy.contains('Auto generate lot').click({force: true})
           })
@@ -38,14 +39,15 @@ describe('stockmanagement receive scenario',() => {
           cy.get(':nth-child(1) > :nth-child(4) > .input-control').type(getFutureDate())
         } else {
           // fill 'Lot Code', use existed lot
-          cy.get('.custom-item-container').eq(0).click().wait(1000).then(() => {
-            cy.get('.adjustment-custom-item .option-list').then(() => {
-              cy.get('body>.adjustment-custom-item .option-list').children().eq(0).click()
+          cy.get('.custom-item-container').eq(0).click().wait(1000)
+            .then(() => {
+              cy.get('.adjustment-custom-item .option-list').then(() => {
+                cy.get('body>.adjustment-custom-item .option-list').children().eq(0).click()
+              })
             })
-          })
         }
       }
-      cy.fillCommonData(index + 1, getYesterday(), 'Doc-' + product);
+      cy.fillCommonData(index + 1, getYesterday(), 'Doc-' + product)
     })
 
     // click 'Save' button
@@ -55,7 +57,8 @@ describe('stockmanagement receive scenario',() => {
 
     // go to receive products page again
     cy.enterMenu(4, 3, 'Receive', 'stockmanagement/receive').then(() => {
-        cy.get('#proceedButton').should('have.value', 'Continue').click().wait(10000).then(() => {
+      cy.get('#proceedButton').should('have.value', 'Continue').click().wait(10000)
+        .then(() => {
           cy.get('.pagination-info').should('contain', 'Showing 4 item(s) out of 4 total')
         })
     })
@@ -65,6 +68,6 @@ describe('stockmanagement receive scenario',() => {
       cy.get('.pagination-info').should('contain', 'Showing 3 item(s) out of 3 total')
     })
 
-    cy.submitAndShowSoh();
+    cy.submitAndShowSoh()
   })
 })

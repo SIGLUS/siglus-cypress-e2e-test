@@ -11,52 +11,80 @@
 //
 // -- This is a parent command --
 //login by UI
-Cypress.Commands.add("login", (user, password) => {
-  cy.visit(Cypress.env("baseUrl"))
+Cypress.Commands.add('login', (user, password) => {
+  cy.visit(Cypress.env('baseUrl'))
   cy.get('#login-username').type(user)
   cy.get('#login-password').type(password)
   cy.contains('Sign In').click()
   cy.url({timeout: 15000}).should('include', '/home')
   cy.get('.home-page > :nth-child(2)').should('contain',
-      'Welcome to OpenLMIS Mozambique')
+    'Welcome to OpenLMIS Mozambique')
 })
 
 //get ID th element and it contain value
 Cypress.Commands.add('containValueById', (element, id, value) => {
-  cy.get(element)
-  .eq(id)
-  .should('contain', value)
+  cy.get(element).eq(id).should('contain', value)
 })
 
-//logout by UI
+// logout by UI
 Cypress.Commands.add('logout', () => {
-  cy.get('.navbar-right.ng-binding').click({force: true}).then(() => {
-    cy.url().should('include', 'login')
+  cy.get('.navbar-right.ng-binding').click()
+  cy.url().should('include', 'login')
+})
+
+Cypress.Commands.add('fillCustomInput', (option = {
+  enableInput: false,
+  cb: () => {
+  }
+}) => {
+  const {enableInput, cb} = option
+  if (enableInput === true) {
+    return
+  }
+  cy.get('.stock-select-container').each((el, index) => {
+    cy.get('.custom-item-container').eq(index).click().wait(1000)
+      .then(() => {
+        cy.get('.adjustment-custom-item .option-list').then(element => {
+        // if has lot option, then pick first option
+          if (element.children().length > 0) {
+            cy.get('body>.adjustment-custom-item .option-list').children().eq(
+              0).click()
+          } else {
+            cy.get('body>.adjustment-custom-item .auto').first().click()
+            cy.get('[openlmis-datepicker="openlmis-datepicker"]').eq(
+              index * 2).click().wait(500)
+              .then(() => {
+                cy.get('.datepicker .datepicker-days tbody tr td').eq(
+                  index % 7).click()
+              })
+          }
+        })
+      })
   })
+
+  if (cb && typeof cb === 'function') {
+    cb()
+  }
 })
 
 // enter menu
 Cypress.Commands.add('enterMenu', (index, subIndex, menuName, url) => {
   cy.get(':nth-child(' + index + ') > [bs-dropdown="dropdown"]').click().then(
-      () => {
-        cy.get('.open > .ng-isolate-scope > :nth-child(' + subIndex
-            + ') > .ng-binding').should('contain', menuName).click().then(
-            () => {
-              cy.url().should('contain', url)
-            })
-      })
-});
+    () => {
+      cy.get('.open > .ng-isolate-scope > :nth-child(' + subIndex
+        + ') > .ng-binding').should('contain', menuName).click().then(
+        () => {
+          cy.url().should('contain', url)
+        })
+    })
+})
 
 // enter All Products clear draft(for issue, receive, adjustments)
 Cypress.Commands.add('enterAllProductsClearDraft', (menuName) => {
-  cy.get('.breadcrumb > :nth-child(1) > .ng-binding').should('contain',
-      'Home');
-  cy.get('.breadcrumb > :nth-child(2) > .ng-binding').should('contain',
-      'Stock Management');
-  cy.get('.breadcrumb > :nth-child(3) > .ng-binding').should('contain',
-      menuName);
-  cy.get('tbody > .ng-isolate-scope > .ng-binding').should('contain',
-      'All Products');
+  cy.get('.breadcrumb > :nth-child(1) > .ng-binding').should('contain', 'Home')
+  cy.get('.breadcrumb > :nth-child(2) > .ng-binding').should('contain', 'Stock Management')
+  cy.get('.breadcrumb > :nth-child(3) > .ng-binding').should('contain', menuName)
+  cy.get('tbody > .ng-isolate-scope > .ng-binding').should('contain', 'All Products')
   cy.get('#proceedButton').click().wait(10000).then(() => {
     // clear if draft existed
     cy.get('.pagination-info').then(element => {
@@ -67,12 +95,12 @@ Cypress.Commands.add('enterAllProductsClearDraft', (menuName) => {
       }
     })
   })
-});
+})
 
 // fill common data(for issue, receive, adjustments)
 Cypress.Commands.add('fillCommonData', (quantity, date, documentationNo) => {
   // fill 'Issue To' / 'Received From'
-  cy.get(':nth-child(1) > :nth-child(6) > .input-control').click();
+  cy.get(':nth-child(1) > :nth-child(6) > .input-control').click()
   // fill 'Quantity'
   cy.get(':nth-child(1) > :nth-child(7) > .input-control').type(quantity)
   // fill 'Date'
@@ -82,7 +110,7 @@ Cypress.Commands.add('fillCommonData', (quantity, date, documentationNo) => {
   })
   // fill 'Documentation No.'
   cy.get(':nth-child(1) > :nth-child(9) > .input-control').click().type(documentationNo)
-});
+})
 
 // submit and show soh(for issue, receive, adjustments)
 Cypress.Commands.add('submitAndShowSoh', () => {
@@ -92,82 +120,10 @@ Cypress.Commands.add('submitAndShowSoh', () => {
     cy.get('[name="vm.signature"]').type('Cypress Robot')
     cy.get('[ng-click="vm.confirm()"]').click().then(() => {
       cy.contains('event has successfully been submitted')
-      cy.get('.breadcrumb > :nth-child(1) > .ng-binding').should('contain','Home')
+      cy.get('.breadcrumb > :nth-child(1) > .ng-binding').should('contain', 'Home')
       cy.get('.breadcrumb > :nth-child(2) > .ng-binding').should('contain', 'Stock Management')
       cy.get('.breadcrumb > :nth-child(3) > .ng-binding').should('contain', 'Stock on Hand')
     })
   })
-});
-
-Cypress.Commands.add('fillCustomInput', (option = {enableInput: false, cb: () => {}}) => {
-    const { enableInput, cb } = option;
-
-    if (enableInput === true) {
-      return;
-    }
-
-    cy.get('.stock-select-container').each((el, index) => {
-        cy.get('.custom-item-container').eq(index).click().wait(1000).then(() => {
-            cy.get('.adjustment-custom-item .option-list').then(element => {
-                // if has lot option, then pick first option
-                if (element.children().length > 0) {
-                    cy.get('body>.adjustment-custom-item .option-list').children().eq(0).click()
-                } else {
-                    cy.get('body>.adjustment-custom-item .auto').first().click()
-                    cy.get('[openlmis-datepicker="openlmis-datepicker"]').eq(index * 2).click().wait(500).then(() => {
-                        cy.get('.datepicker .datepicker-days tbody tr td').eq(index % 7).click()
-                    })
-                }
-            })
-        })
-    })
-
-    if ( cb && typeof cb === "function") {
-        cb()
-    }
 })
 
-// login by API
-// Cypress.Commands.add("login", (user, password) => {
-//     cy.request({
-//         method:'POST',
-//         url:'https://qa.siglus.us/api/oauth/token?grant_type=password',
-//         headers:{
-//             Authorization:'Basic dXNlci1jbGllbnQ6Y2hhbmdlbWU=',
-//             'Postman-Token':'af090791-a6dc-49f0-a0a8-a8e1aea41c1c',
-//             Host: 'qa.siglus.us',
-//             'Content-Length': 36,
-//             'Cache-Control':'no-cache',
-//             accept :'application/json, text/plain, \\*/\\*',
-//
-//         },
-//         form : true,
-//         body :{
-//             data : {
-//                 "username": user,
-//                 "password": password
-//             }
-//         }
-//
-//     }).then((resp) => {
-//         window.localStorage.setItem("jwt", resp.body.access_token)
-//     })
-//
-// })
-// logout by storage
-// Cypress.Commands.add("logout",() => {
-//     cy.window.its('locaStorage')
-//         .invoke('getItem','jwt')
-//         .should('not.exist')
-// })
-
-// -- This is a child command --
-// Cypress.Commands.add("drag", { prevSubject: 'element'}, (subject, options) => { ... })
-//
-//
-// -- This is a dual command --
-// Cypress.Commands.add("dismiss", { prevSubject: 'optional'}, (subject, options) => { ... })
-//
-//
-// -- This will overwrite an existing command --
-// Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })

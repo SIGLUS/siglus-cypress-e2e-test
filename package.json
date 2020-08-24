@@ -4,12 +4,15 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "check": "eslint cypress"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "cypress": "5.0.0"
+    "cypress": "^5.0.0",
+    "eslint": "^7.7.0",
+    "eslint-plugin-cypress": "^2.11.1"
   },
   "test:e2e": "vue-cli-service test:e2e --mode development --headless",
   "test:e2e-gui": "vue-cli-service test:e2e --mode development"
