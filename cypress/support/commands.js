@@ -98,10 +98,10 @@ Cypress.Commands.add('enterAllProductsClearDraft', (menuName) => {
   })
 })
 
-Cypress.Commands.add('goToNavigation',(navigation = []) => {
+Cypress.Commands.add('goToNavigation', (navigation = []) => {
   cy.get('[bs-dropdown="dropdown"]').contains(navigation[0]).click().then(() => {
-    if(navigation[1]) {
-      cy.get('a').contains(navigation[1]).click();
+    if (navigation[1]) {
+      cy.get('a').contains(navigation[1]).click()
     }
   })
 })
