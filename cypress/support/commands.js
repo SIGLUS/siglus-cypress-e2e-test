@@ -98,6 +98,14 @@ Cypress.Commands.add('enterAllProductsClearDraft', (menuName) => {
   })
 })
 
+Cypress.Commands.add('goToNavigation',(navigation = []) => {
+  cy.get('[bs-dropdown="dropdown"]').contains(navigation[0]).click().then(() => {
+    if(navigation[1]) {
+      cy.get('a').contains(navigation[1]).click();
+    }
+  })
+})
+
 // fill common data(for issue, receive, adjustments)
 Cypress.Commands.add('fillCommonData', (quantity, date, documentationNo) => {
   // fill 'Issue To' / 'Received From'
