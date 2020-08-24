@@ -24,7 +24,7 @@ describe('stockmanagement receive scenario',() => {
         cy.get('#proceedButton').click().wait(10000).then(() => {
           // clear if draft existed
           cy.get('.pagination-info').then(element => {
-            if (element.text() !== 'Showing no items') {
+            if (!element.text().includes('Showing no items')) {
               cy.get('[ng-click="vm.removeDisplayItems()"]').click().then(() => {
                 cy.get('[ng-click="vm.confirm()"]').click()
               })
