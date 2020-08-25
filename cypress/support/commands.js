@@ -35,28 +35,43 @@ Cypress.Commands.add('logout', () => {
 
 Cypress.Commands.add('fillCustomInput', (option = {
   enableInput: false,
+  enableDateColumn: true,
+  forceAutoGerate: false,
   cb: () => {
   }
 }) => {
-  const {enableInput, cb} = option
-  if (enableInput === true) {
-    return
-  }
+  const {enableInput, enableDateColumn, forceAutoGerate, cb} = option
   cy.get('.stock-select-container').each((el, index) => {
-    cy.get('.custom-item-container').eq(index).click().wait(1000)
+    if (enableInput) {
+      const firstOption = el.find('.option-list>div').first()
+      if (firstOption) {
+        cy.wrap(el.find('.adjustment-input')).type(firstOption.text(), {force: true})
+      } else {
+        cy.wrap(el.find('.adjustment-input')).type(`INPUT-${Math.random().toFixed(5) * 100000}`, {force: true})
+        cy.get('[openlmis-datepicker="openlmis-datepicker"]').eq(
+          index * (enableDateColumn ? 2 : 1)).click({force: true}).wait(500)
+          .then(() => {
+            cy.get('.datepicker .datepicker-days tbody tr td').eq(
+              index % 7).click({force: true})
+          })
+      }
+      return
+    }
+    cy.get('.custom-item-container').eq(index).focus().click({force: true})
+      .wait(1000)
       .then(() => {
         cy.get('.adjustment-custom-item .option-list').then(element => {
         // if has lot option, then pick first option
-          if (element.children().length > 0) {
+          if (element.children().length > 0 && !forceAutoGerate) {
             cy.get('body>.adjustment-custom-item .option-list').children().eq(
-              0).click()
+              0).click({force: true})
           } else {
-            cy.get('body>.adjustment-custom-item .auto').first().click()
+            cy.get('body>.adjustment-custom-item .auto').first().click({force: true})
             cy.get('[openlmis-datepicker="openlmis-datepicker"]').eq(
-              index * 2).click().wait(500)
+              index * (enableDateColumn ? 2 : 1)).click({force: true}).wait(500)
               .then(() => {
                 cy.get('.datepicker .datepicker-days tbody tr td').eq(
-                  index % 7).click()
+                  index % 7).click({force: true})
               })
           }
         })
@@ -122,13 +137,27 @@ Cypress.Commands.add('fillCommonData', (quantity, date, documentationNo) => {
 })
 
 // submit and show soh(for issue, receive, adjustments)
-Cypress.Commands.add('submitAndShowSoh', () => {
+Cypress.Commands.add('submitAndShowSoh', (isPhysicalInventory) => {
   // click 'Submit' button
   cy.get('[ng-click="vm.submit()"]').click().then(() => {
-    cy.get('.form-group > .is-required').should('contain', 'Signature')
+    if (isPhysicalInventory) {
+      cy.get('form label.is-required').should('contain', 'Signature')
+    } else {
+      cy.get('.form-group > .is-required').should('contain', 'Signature')
+    }
     cy.get('[name="vm.signature"]').type('Cypress Robot')
-    cy.get('[ng-click="vm.confirm()"]').click().then(() => {
-      cy.contains('event has successfully been submitted')
+    let btnSelector = '[ng-click="vm.confirm()"]'
+    if (isPhysicalInventory) {
+      btnSelector = '.modal-footer input[type="submit"]'
+    } else {
+      btnSelector = '[ng-click="vm.confirm()"]'
+    }
+    cy.get(btnSelector).click().then(() => {
+      if (isPhysicalInventory) {
+        cy.wait(5000).contains('Physical Inventory has successfully been submitted', {timeout: 20000})
+      } else {
+        cy.contains('event has successfully been submitted')
+      }
       cy.get('.breadcrumb > :nth-child(1) > .ng-binding').should('contain', 'Home')
       cy.get('.breadcrumb > :nth-child(2) > .ng-binding').should('contain', 'Stock Management')
       cy.get('.breadcrumb > :nth-child(3) > .ng-binding').should('contain', 'Stock on Hand')
