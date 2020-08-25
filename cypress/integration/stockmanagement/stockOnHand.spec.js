@@ -23,7 +23,7 @@ describe('stock on hand', () => {
             cy.get(':nth-child(1) > .text-align-right').then(elements => {
               productOnHand = elements.text()
             })
-            cy.get(':nth-child(1) > :nth-child(7) > .primary').click().wait(1000).then(() => {
+            cy.get(':nth-child(1) > :nth-child(7) > .primary').click().wait(10000).then(() => {
               cy.log(productName)
               cy.get('.product-name-header > .ng-binding').should('contain', productName)
               cy.log(productOnHand)
@@ -58,7 +58,7 @@ describe('stock on hand', () => {
             cy.get(':nth-child(1) > .text-align-right').then(elements => {
               productOnHand = elements.text()
             })
-            cy.get(':nth-child(1) > :nth-child(7) > .primary').click().wait(1000).then(() => {
+            cy.get(':nth-child(1) > :nth-child(7) > .primary').click().wait(10000).then(() => {
               cy.log(productName)
               cy.get('.product-name-header > .ng-binding').should('contain', productName)
               cy.log(productOnHand)
@@ -100,7 +100,7 @@ describe('stock on hand', () => {
             cy.get(':nth-child(2) > .text-align-right').then(elements => {
               lotOnHand = elements.text()
             })
-            cy.get(':nth-child(2) > :nth-child(7) > .primary').click().wait(1000).then(() => {
+            cy.get(':nth-child(2) > :nth-child(7) > .primary').click().wait(10000).then(() => {
               cy.log(productName)
               cy.get('.product-name-header > .ng-binding').should('contain', productName)
               cy.log(lotOnHand)
