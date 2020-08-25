@@ -1,6 +1,6 @@
 // E2E test for stockmanagement issue scenario
 
-import {getYesterday} from '../../utils/date-util'
+import {getToday} from '../../utils/date-util'
 
 describe('stockmanagement issue scenario', () => {
 
@@ -38,7 +38,7 @@ describe('stockmanagement issue scenario', () => {
             }
           })
       })
-      cy.fillCommonData(index + 1, getYesterday(), 'Doc-' + product)
+      cy.fillCommonData(index + 1, getToday(), 'Doc-' + product)
     })
 
     // click 'Save' button

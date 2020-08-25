@@ -14,6 +14,10 @@ const formatDate = (date) => {
   return [day, month, year].join('/')
 }
 
+const getToday = () => {
+  return formatDate(new Date())
+}
+
 const getYesterday = () => {
   const today = new Date()
   const yesterday = new Date()
@@ -28,4 +32,4 @@ const getFutureDate = () => {
   return formatDate(future)
 }
 
-export {getYesterday, getFutureDate}
+export {getToday, getYesterday, getFutureDate}
