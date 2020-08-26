@@ -72,8 +72,6 @@ describe('physical inventory', () => {
 
       cy.get('button.danger[ng-click="vm.removeLot(lineItem)"]').focus().wait(1000).click({force: true})
 
-      // fillLots();
-
       cy.get('button[ng-click="vm.saveDraft()"]').click()
 
       // fill soh what already have
@@ -106,7 +104,7 @@ describe('physical inventory', () => {
 
     //detail page
     cy.get('#proceedButton').click().wait(12000).then(() => {
-      fillLots()
+      // fillLots()
       fillPageDataSoh()
     })
 
