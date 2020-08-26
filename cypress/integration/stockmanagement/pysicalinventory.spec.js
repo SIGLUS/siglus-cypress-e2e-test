@@ -153,6 +153,15 @@ describe('physical inventory', () => {
       .blur()
       .then(() => {
         cy.get('input[ng-model="lineItem.reasonFreeText"]').first().type('random comments', {force: true})
+        cy.get('button[ng-click="stockReasonsCtrl.openModal()"]').first().click({force: true}).then(() => {
+          cy.get('.modal-dialog').click(68, 110).then(() => {
+            cy.get('ul.select2-results__options>li').first().click()
+            cy.get('.modal-body input[ng-model="vm.quantity"]').type('0', {force: true})
+            cy.get('.modal-body button.add').click({force: true})
+            cy.get('.modal-footer button[type="submit"]').click({force: true})
+          })
+
+        })
       })
 
     // add lot by input
