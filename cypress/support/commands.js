@@ -170,3 +170,53 @@ Cypress.Commands.add('submitAndShowSoh', (isPhysicalInventory) => {
   })
 })
 
+Cypress.Commands.add('viewProductByProduct', (productCode, movementQuality) => {
+  searchProduct(productCode, '', movementQuality)
+})
+
+Cypress.Commands.add('viewProductByLot', (productCode, lotCode, movementQuality) => {
+  searchProduct(productCode, lotCode, movementQuality)
+})
+
+function searchProduct(productCode, lotcode, movementQuality) {
+  let haveSearched = false
+  cy.get('table tbody>tr').then(elements => {
+    elements.toArray().forEach(row => {
+      let rows = row.querySelectorAll('td')
+      cy.log(rows.item(2).innerHTML)
+      if (rows.item(0).innerHTML.includes(productCode)
+        && rows.item(2).innerHTML.includes(lotcode)
+        && !haveSearched) {
+        cy.log('xiu' + row.querySelector('td').innerHTML)
+        haveSearched = true
+        cy.log(row.querySelector('button'))
+        row.querySelector('button').click({force: true})
+        cy.wait(1000).then(() => {
+          cy.get('tbody > :nth-child(1) > :nth-child(5)').then(elements => {
+            cy.log('jingjing' + elements.text())
+            expect(elements.text()).equal(movementQuality)
+          })
+        })
+      }
+    })
+
+    if (haveSearched === false) {
+      cy.get('.openlmis-pagination ul>li:last-child').then(e => {
+        const el = e[0]
+        const fn = () => searchProduct(productCode, lotcode, movementQuality)
+        goNextPage(el, fn)
+      })
+    }
+  })
+}
+
+function goNextPage(element, searchProductFunc) {
+  if (element.classList.contains('disabled')) {
+    cy.log('not exist search product')
+    expect(element.classList).contain('disabled')
+  } else {
+    cy.get('[ng-class="{disabled : pagination.isLastPage()}"] > .ng-binding').click().wait(5000).then(() => {
+      searchProductFunc()
+    })
+  }
+}
