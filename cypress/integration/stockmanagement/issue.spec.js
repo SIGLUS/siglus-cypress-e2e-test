@@ -21,7 +21,7 @@ describe('stockmanagement issue scenario', () => {
     // add products and fill value
     const KIT = 'KIT AL/US'
     const products = ['Ibuprofeno', 'Hidralazina', KIT, 'Acarbose']
-    cy.wrap(products).each((product, index) => {
+    cy.wrap(products).each((product) => {
       // add product
       cy.get('#select2-productSelect-container').click().then(() => {
         cy.get('#select2-productSelect-results').contains(product).click().then(
@@ -38,7 +38,7 @@ describe('stockmanagement issue scenario', () => {
             }
           })
       })
-      cy.fillCommonData(index + 1, getToday(), 'Doc-' + product)
+      cy.fillCommonData(1, getToday(), 'Doc-' + product)
     })
 
     // click 'Save' button
