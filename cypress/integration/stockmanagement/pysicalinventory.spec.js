@@ -7,7 +7,7 @@ describe('physical inventory', () => {
     cy.logout()
   })
 
-  it('Physical inventory', () => {
+  it('Physical inventory save', () => {
     //entry
     cy.goToNavigation(['Stock Management', 'Physical inventory'])
     cy.get('th').contains('Program').should('be.visible')
@@ -43,41 +43,71 @@ describe('physical inventory', () => {
         expect(elements.eq(9).text()).equal('Actions')
       })
 
-      // add product
-      // cy.get('button[ng-click="vm.addProducts()"]').click().wait(1000).then(() => {
-      //     cy.get('#productSelect option[selected="selected"]').trigger('click', {force: true}).then(() => {
-      //         cy.get('.select2-container ul.select2-results__options>li').last().click()
-      //     })
+      cy.get('.progress-bar-container .progress-bar>span').then(el => expect(el.text()).equal('0%'))
+
+      // filter
+      // cy.get('button.filters').click({force:true}).then(() => {
+      //   cy.get('#searchFor')
+      //   .type('Artemeter+Lumefantrina; 120mg+20mg 1x6; Comp')
+      //   cy.get('.popover-content input[value="Search"]').click({force: true})
       // })
 
-      // cy.get('input[ng-model="lineItem.quantity"]').first().type(Math.random().toFixed(4) * 10000, {force: true})
-      //
-      // cy.get('button[ng-click="stockReasonsCtrl.openModal()"]').first().click({force: true})
+      // add product
+      cy.get('button[ng-click="vm.addProducts()"]').click().wait(1000).then(() => {
+        cy.get('.modal-dialog').click(68, 100).then(() => {
+          // eslint-disable-next-line max-len
+          cy.get('ul.select2-results__options>li').contains('Artemeter+Lumefantrina; 120mg+20mg 1x6; Comp').click({force: true})
+        })
 
-      // duplicate lot err
-      // // add lot by input
-      // cy.get('button[ng-click="vm.addLot(lineItems[0])"]').first().focus().click({force: true})
-      //   .then(() => {
-      //     cy.fillCustomInput({enableDateColumn: false,
-      //       enableInput: true})
-      //   })
-      //
-      // // add lot by select if option exist
-      // cy.get('button[ng-click="vm.addLot(lineItems[0])"]').first().focus().click({force: true})
-      //   .then(() => {
-      //     cy.fillCustomInput({enableDateColumn: false})
-      //   })
-      //
-      // // add lot by select if option exist
-      // cy.get('button[ng-click="vm.addLot(lineItems[0])"]').first().focus().click({force: true})
-      //   .then(() => {
-      //     cy.fillCustomInput({enableDateColumn: false,
-      //       forceAutoGerate: true})
-      //   })
+        cy.get('.modal-dialog').click(300, 100).then(() => {
+          cy.get('ul.select2-results__options>li').contains('SEM-LOTE-08O05-012022-0').click({force: true})
+        })
+
+        cy.get('.modal-body button.add').click()
+
+        cy.wait(500).get('.modal-body input[ng-model="item.quantity"]').type(1)
+
+        cy.get('.modal-footer button[ng-click="vm.confirm()"]').click()
+      })
+
+      cy.get('button.danger[ng-click="vm.removeLot(lineItem)"]').focus().wait(1000).click({force: true})
+
+      // fillLots();
+
+      cy.get('button[ng-click="vm.saveDraft()"]').click()
 
       // fill soh what already have
-      fillPageDataSoh()
+      // fillPageDataSoh()
 
+    })
+
+  })
+
+  it('delete draft', () => {
+    //entry
+    cy.goToNavigation(['Stock Management', 'Physical inventory'])
+
+    cy.get('td').contains('Draft').should('be.visible')
+    cy.get('#proceedButton').should('have.attr', 'value', 'Continue')
+
+    //detail page
+    cy.get('#proceedButton').click().wait(12000).then(() => {
+
+      cy.get('button[ng-click="vm.delete()"]').click().then(() => {
+        cy.get('.modal-footer .danger[ng-click="vm.confirm()"]').click().wait(2000)
+      })
+    })
+
+  })
+
+  it('submit', () => {
+    //entry
+    cy.goToNavigation(['Stock Management', 'Physical inventory'])
+
+    //detail page
+    cy.get('#proceedButton').click().wait(12000).then(() => {
+      fillLots()
+      fillPageDataSoh()
     })
 
   })
@@ -88,20 +118,11 @@ describe('physical inventory', () => {
         const allTd = [...row.querySelectorAll('td')]
         if (allTd[5].querySelector('input')) {
           const soh = allTd[4].innerHTML
-          if (isNaN(parseInt(soh.trim()))) {
-            cy.wrap(allTd[5]).within(() => {
-              cy.get('input').focus().type(0, {force: true})
-            })
-          } else {
-            cy.wrap(allTd[5]).within(() => {
-              cy.get('input').focus().type(soh.trim(), {force: true})
-            })
-          }
+          const value = isNaN(parseInt(soh.trim())) ? 0 : soh.trim()
+          cy.wrap(allTd[5]).within(() => {
+            cy.get('input').focus().type(value, {force: true})
+          })
         }
-
-        // cy.wait(10000).then(() => {
-        //     goNextPage(fillPageDataSoh)
-        // })
       })
     })
 
@@ -115,6 +136,8 @@ describe('physical inventory', () => {
 
   const goNextPage = (el, cb) => {
     if (el.classList.contains('disabled')) {
+      cy.focused().blur()
+      cy.get('.progress-bar-container .progress-bar>span').then(el => expect(el.text()).equal('100%'))
       cy.submitAndShowSoh(true)
     } else {
       el.querySelector('a').click()
@@ -122,5 +145,45 @@ describe('physical inventory', () => {
         cb()
       })
     }
+  }
+
+  const fillLots = () => {
+    // eslint-disable-next-line max-len
+    cy.get('input[ng-model="lineItem.quantity"]').first().type(parseInt(Math.random().toFixed(4) * 10000), {force: true}).wait(500)
+      .blur()
+      .then(() => {
+        cy.get('input[ng-model="lineItem.reasonFreeText"]').first().type('random comments', {force: true})
+      })
+
+    // add lot by input
+    cy.get('button[ng-click="vm.addLot(lineItems[0])"]').eq(0).focus().click({force: true})
+      .then(() => {
+        cy.fillCustomInput({enableDateColumn: false,
+          enableInput: true})
+      })
+
+    // add lot by select if option exist
+    cy.get('button[ng-click="vm.addLot(lineItems[0])"]').eq(1).focus().click({force: true})
+      .then(() => {
+        cy.fillCustomInput({enableDateColumn: false})
+      })
+
+    // // add lot by select if option exist
+    cy.get('button[ng-click="vm.addLot(lineItems[0])"]').eq(2).focus().click({force: true})
+      .then(() => {
+        cy.fillCustomInput({enableDateColumn: false,
+          forceAutoGerate: true})
+
+        cy.wait(2000).then(() => {
+          cy.get('.stock-select-container').last().then((el) => {
+            const invalidEl = el.find('div.is-invalid')
+            if (invalidEl && invalidEl[0]) {
+              cy.get('.stock-select-container div.is-invalid input').clear({force: true})
+              cy.fillCustomInput({enableDateColumn: false,
+                enableInput: true})
+            }
+          })
+        })
+      })
   }
 })

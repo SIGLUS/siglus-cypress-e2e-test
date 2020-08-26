@@ -42,12 +42,17 @@ Cypress.Commands.add('fillCustomInput', (option = {
 }) => {
   const {enableInput, enableDateColumn, forceAutoGerate, cb} = option
   cy.get('.stock-select-container').each((el, index) => {
+    // if lotCode exist then skip
+    if (el.find('input[ng-model="lineItem.lot.lotCode"]').first().val().trim()) {
+      return
+    }
     if (enableInput) {
       const firstOption = el.find('.option-list>div').first()
-      if (firstOption) {
-        cy.wrap(el.find('.adjustment-input')).type(firstOption.text(), {force: true})
+      if (firstOption && firstOption[0]) {
+        cy.wrap(el.find('.adjustment-input')).type(firstOption.text().trim(), {force: true})
       } else {
-        cy.wrap(el.find('.adjustment-input')).type(`INPUT-${Math.random().toFixed(5) * 100000}`, {force: true})
+        // eslint-disable-next-line max-len
+        cy.wrap(el.find('.adjustment-input')).type(`INPUT-${parseInt(Math.random().toFixed(8) * 100000000)}`, {force: true})
         cy.get('[openlmis-datepicker="openlmis-datepicker"]').eq(
           index * (enableDateColumn ? 2 : 1)).click({force: true}).wait(500)
           .then(() => {
@@ -114,9 +119,9 @@ Cypress.Commands.add('enterAllProductsClearDraft', (menuName) => {
 })
 
 Cypress.Commands.add('goToNavigation', (navigation = []) => {
-  cy.get('[bs-dropdown="dropdown"]').contains(navigation[0]).click().then(() => {
+  cy.get('[bs-dropdown="dropdown"]').contains(navigation[0]).click({force: true}).then(() => {
     if (navigation[1]) {
-      cy.get('a').contains(navigation[1]).click()
+      cy.get('a').contains(navigation[1]).click({force: true})
     }
   })
 })
