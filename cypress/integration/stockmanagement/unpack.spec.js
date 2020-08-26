@@ -45,7 +45,7 @@ describe('physical inventory', () => {
                 cy.containValueById('td', 1,
                   'Artemeter+Lumefantrina; 120mg+20mg 1x6; Comp')
               })
-            cy.fillCustomInput()
+            // cy.fillCustomInput()
           })
       })
     })
