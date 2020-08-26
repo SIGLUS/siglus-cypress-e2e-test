@@ -28,24 +28,28 @@ describe('stockmanagement receive scenario', () => {
         cy.get('.select2-search__field').type(product).type('{enter}')
         cy.get('.add').click()
       })
-      if (product !== KIT) {
-        if (product === IBUPROFENO) {
-          // fill 'Lot Code', create new lot
-          // eslint-disable-next-line max-len
-          cy.get(':nth-child(1) > :nth-child(3) > .stock-select-container > [ng-if="!enableInput"] > .form-control').click().then(() => {
-            cy.contains('Auto generate lot').click({force: true})
-          })
-          // fill 'Expiry Date'
-          cy.get(':nth-child(1) > :nth-child(4) > .input-control').type(getFutureDate())
-        } else {
-          // fill 'Lot Code', use existed lot
-          cy.get('.custom-item-container').eq(0).click().wait(1000)
-            .then(() => {
-              cy.get('.adjustment-custom-item .option-list').then(() => {
-                cy.get('body>.adjustment-custom-item .option-list').children().eq(0).click()
-              })
+      if (product === KIT) {
+        // 'Lot Code' should be empty
+        // eslint-disable-next-line max-len
+        cy.get(':nth-child(1) > :nth-child(3) > .stock-select-container > [ng-if="!enableInput"] > .form-control').should('not.exist')
+        // 'Expiry Date' should be empty
+        cy.get(':nth-child(1) > :nth-child(4) > .input-control').should('not.exist')
+      } else if (product === IBUPROFENO) {
+        // fill 'Lot Code', create new lot
+        // eslint-disable-next-line max-len
+        cy.get(':nth-child(1) > :nth-child(3) > .stock-select-container > [ng-if="!enableInput"] > .form-control').click().then(() => {
+          cy.contains('Auto generate lot').click({force: true})
+        })
+        // fill 'Expiry Date'
+        cy.get(':nth-child(1) > :nth-child(4) > .input-control').type(getFutureDate())
+      } else {
+        // fill 'Lot Code', use existed lot
+        cy.get('.custom-item-container').eq(0).click().wait(1000)
+          .then(() => {
+            cy.get('.adjustment-custom-item .option-list').then(() => {
+              cy.get('body>.adjustment-custom-item .option-list').children().eq(0).click()
             })
-        }
+          })
       }
       cy.fillCommonData(index + 1, getYesterday(), 'Doc-' + product)
     })
