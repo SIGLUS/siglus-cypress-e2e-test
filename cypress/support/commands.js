@@ -183,7 +183,6 @@ function searchProduct(productCode, lotcode, movementQuality) {
   cy.get('table tbody>tr').then(elements => {
     elements.toArray().forEach(row => {
       let rows = row.querySelectorAll('td')
-      cy.log(rows.item(2).innerHTML)
       if (rows.item(0).innerHTML.includes(productCode)
         && rows.item(2).innerHTML.includes(lotcode)
         && !haveSearched) {
@@ -193,7 +192,7 @@ function searchProduct(productCode, lotcode, movementQuality) {
         row.querySelector('button').click({force: true})
         cy.wait(1000).then(() => {
           cy.get('tbody > :nth-child(1) > :nth-child(5)').then(elements => {
-            cy.log('jingjing' + elements.text())
+            cy.log('search elements' + elements.text())
             expect(elements.text()).equal(movementQuality)
           })
         })
@@ -212,8 +211,7 @@ function searchProduct(productCode, lotcode, movementQuality) {
 
 function goNextPage(element, searchProductFunc) {
   if (element.classList.contains('disabled')) {
-    cy.log('not exist search product')
-    expect(element.classList).contain('disabled')
+    assert.fail('not exist search product')
   } else {
     cy.get('[ng-class="{disabled : pagination.isLastPage()}"] > .ng-binding').click().wait(5000).then(() => {
       searchProductFunc()
