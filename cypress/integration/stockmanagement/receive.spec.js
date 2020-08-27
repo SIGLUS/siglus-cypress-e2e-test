@@ -1,6 +1,7 @@
 // E2E test for stockmanagement receive scenario
 
 import {getYesterday, getFutureDate} from '../../utils/date-util'
+import {KIT, IBUPROFENO, PRODUCTS} from '../../utils/prodcut-constant'
 
 describe('stockmanagement receive scenario', () => {
 
@@ -17,12 +18,7 @@ describe('stockmanagement receive scenario', () => {
     cy.enterMenu(4, 3, 'Receive', 'stockmanagement/receive').then(() => {
       cy.enterAllProductsClearDraft('Receive')
     })
-
-    // add products and fill value
-    const KIT = 'KIT AL/US'
-    const IBUPROFENO = 'Ibuprofeno'
-    const products = [KIT, IBUPROFENO, 'Hidralazina', 'Acetazolamida']
-    cy.wrap(products).each((product, index) => {
+    cy.wrap(PRODUCTS).each((product, index) => {
       // add product
       cy.get('#select2-productSelect-container').click().then(() => {
         cy.get('.select2-search__field').type(product).type('{enter}')

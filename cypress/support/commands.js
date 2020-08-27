@@ -161,7 +161,7 @@ Cypress.Commands.add('submitAndShowSoh', (isPhysicalInventory) => {
       if (isPhysicalInventory) {
         cy.wait(5000).contains('Physical Inventory has successfully been submitted', {timeout: 20000})
       } else {
-        cy.wait(5000).contains('event has successfully been submitted')
+        cy.wait(5000).contains('has successfully been submitted')
       }
       cy.get('.breadcrumb > :nth-child(1) > .ng-binding').should('contain', 'Home')
       cy.get('.breadcrumb > :nth-child(2) > .ng-binding').should('contain', 'Stock Management')
@@ -190,7 +190,7 @@ function searchProduct(productCode, lotcode, movementQuality) {
         haveSearched = true
         cy.log(row.querySelector('button'))
         row.querySelector('button').click({force: true})
-        cy.wait(1000).then(() => {
+        cy.wait(5000).then(() => {
           cy.get('tbody > :nth-child(1) > :nth-child(5)').then(elements => {
             cy.log('search elements' + elements.text())
             expect(elements.text()).equal(movementQuality)

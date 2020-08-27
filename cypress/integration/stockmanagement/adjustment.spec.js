@@ -1,6 +1,7 @@
 // E2E test for stockmanagement adjustment scenario
 
-import {getFutureDate, getToday} from '../../utils/date-util'
+import {getFutureDate} from '../../utils/date-util'
+import {KIT, IBUPROFENO, HIDRALAZINA, PRODUCTS} from '../../utils/prodcut-constant'
 
 describe('stockmanagement adjustment scenario', () => {
 
@@ -19,35 +20,13 @@ describe('stockmanagement adjustment scenario', () => {
     })
 
     // add products and fill value
-    const KIT = 'KIT AL/US'
-    const products = ['Fenobarbital', 'Sifilis', 'Prometazina', KIT]
-    cy.wrap(products).each((product, index) => {
+    cy.wrap(PRODUCTS).each((product, index) => {
       // add product
       cy.get('#select2-productSelect-container').click().then(() => {
         cy.get('.select2-search__field').type(product).type('{enter}')
         cy.get('.add').click()
         if (product !== KIT) {
-          if (product === 'Sifilis') {
-            // fill 'Lot Code', use existed lot
-            cy.get('.custom-item-container').eq(0).click().wait(1000)
-              .then(() => {
-                cy.get('.adjustment-custom-item .option-list').then(() => {
-                  cy.get('body>.adjustment-custom-item .option-list').children().eq(0).click()
-                })
-              })
-            cy.get(':nth-child(1) > :nth-child(6) > .input-control').click().then(() => {
-              cy.get('.select2-search__field').type('Negative Correction').type('{enter}')
-            })
-            cy.get(':nth-child(1) > :nth-child(7) > .input-control').type('test')
-          } else  if (product === 'Prometazina') {
-            // fill 'Lot Code', input lot
-            cy.get('.custom-item-container').eq(0).type('new lot')
-            cy.get(':nth-child(1) > :nth-child(4) > .input-control').type(getFutureDate())
-            cy.get(':nth-child(1) > :nth-child(6) > .input-control').click().then(() => {
-              cy.get('.select2-search__field').type('Positive Correction').type('{enter}')
-              cy.get(':nth-child(1) > :nth-child(7) > .input-control').type('test')
-            })
-          } else {
+          if (product === IBUPROFENO) {
             // fill 'Lot Code', create new lot
             // fill 'Expiry Date'
             cy.get(':nth-child(1) > :nth-child(4) > .input-control').type(getFutureDate())
@@ -55,11 +34,26 @@ describe('stockmanagement adjustment scenario', () => {
               .click().then(() => {
                 cy.contains('Auto generate lot').click({force: true})
               })
-            cy.get(':nth-child(1) > :nth-child(6) > .input-control').click()
+          } else if (product === HIDRALAZINA) {
+            // fill 'Lot Code', use existed lot
+            cy.get('.custom-item-container').eq(0).click().wait(1000)
+              .then(() => {
+                cy.get('.adjustment-custom-item .option-list').then(() => {
+                  cy.get('body>.adjustment-custom-item .option-list').children().eq(0).click()
+                })
+              })
+          } else {
+            // fill 'Lot Code', input lot
+            cy.get('.custom-item-container').eq(0).type('new lot')
+            cy.get(':nth-child(1) > :nth-child(4) > .input-control').type(getFutureDate())
           }
         }
       })
-      cy.get(':nth-child(1) > :nth-child(8) > .input-control').type(index + 1)
+      cy.get(':nth-child(1) > :nth-child(6) > .input-control').click().then(() => {
+        cy.get('.select2-search__field').type('Positive Correction').type('{enter}')
+      })
+      cy.get(':nth-child(1) > :nth-child(7) > .input-control').type('test')
+      cy.get(':nth-child(1) > :nth-child(8) > .input-control').type(1)
       cy.get(':nth-child(1) > :nth-child(10) > .input-control').click().type('Doc-' + product)
     })
 
@@ -80,12 +74,58 @@ describe('stockmanagement adjustment scenario', () => {
     cy.get(':nth-child(1) > :nth-child(11) > .danger').click().then(() => {
       cy.get('.pagination-info').should('contain', 'Showing 3 item(s) out of 3 total')
     })
+
+    // click "Remove' button
+    cy.get(':nth-child(2) > :nth-child(11) > .danger').click().then(() => {
+      cy.get('.pagination-info').should('contain', 'Showing 2 item(s) out of 2 total')
+    })
+
+    // click 'Save' button
+    cy.get('[ng-click="vm.save()"]').click().then(() => {
+      cy.contains('Save is successful')
+    })
+
+    cy.submitAndShowSoh()
+    cy.viewProductByProduct('01C02', '1')
+
+    cy.enterMenu(4, 5, 'Adjustments', 'stockmanagement/adjustment').then(() => {
+      cy.enterAllProductsClearDraft('Adjustments')
+    })
+    // add products and fill value
+    cy.wrap(PRODUCTS).each((product) => {
+      // add product
+      cy.get('#select2-productSelect-container').click().then(() => {
+        cy.get('.select2-search__field').type(product).type('{enter}')
+        cy.get('.add').click()
+        if (product !== KIT) {
+          // fill 'Lot Code', use existed lot
+          cy.get('.custom-item-container').eq(0).click().wait(1000)
+            .then(() => {
+              cy.get('.adjustment-custom-item .option-list').then(() => {
+                cy.get('body>.adjustment-custom-item .option-list').children().eq(0).click()
+              })
+            })
+        }
+      })
+      cy.get(':nth-child(1) > :nth-child(6) > .input-control').click().then(() => {
+        cy.get('.select2-search__field').type('Negative Correction').type('{enter}')
+      })
+      cy.get(':nth-child(1) > :nth-child(7) > .input-control').type('test')
+      cy.get(':nth-child(1) > :nth-child(8) > .input-control').type(1)
+      cy.get(':nth-child(1) > :nth-child(10) > .input-control').click().type('Doc-' + product)
+    })
+
     // click "Remove' button
     cy.get(':nth-child(1) > :nth-child(11) > .danger').click().then(() => {
+      cy.get('.pagination-info').should('contain', 'Showing 3 item(s) out of 3 total')
+    })
+
+    // click "Remove' button
+    cy.get(':nth-child(2) > :nth-child(11) > .danger').click().then(() => {
       cy.get('.pagination-info').should('contain', 'Showing 2 item(s) out of 2 total')
     })
 
     cy.submitAndShowSoh()
-
+    cy.viewProductByProduct('01C02', '1')
   })
 })
