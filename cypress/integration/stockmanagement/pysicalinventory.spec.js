@@ -104,7 +104,7 @@ describe('physical inventory', () => {
 
     //detail page
     cy.get('#proceedButton').click().wait(12000).then(() => {
-      // fillLots()
+      fillLots()
       fillPageDataSoh()
     })
 

@@ -65,7 +65,7 @@ Cypress.Commands.add('fillCustomInput', (option = {
     cy.get('.custom-item-container').eq(index).focus().click({force: true})
       .wait(1000)
       .then(() => {
-        cy.get('.adjustment-custom-item .option-list').then(element => {
+        cy.get('.adjustment-custom-item .option-list').eq(index).then(element => {
         // if has lot option, then pick first option
           if (element.children().length > 0 && !forceAutoGerate) {
             cy.get('body>.adjustment-custom-item .option-list').children().eq(
