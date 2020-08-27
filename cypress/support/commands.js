@@ -159,7 +159,7 @@ Cypress.Commands.add('submitAndShowSoh', (isPhysicalInventory) => {
     }
     cy.get(btnSelector).click().then(() => {
       if (isPhysicalInventory) {
-        // cy.wait(8000).contains('Physical Inventory has successfully been submitted', {timeout: 20000})
+        cy.contains('Physical Inventory has successfully been submitted', {timeout: 120000})
       } else {
         cy.wait(5000).contains('has successfully been submitted')
       }

@@ -52,6 +52,23 @@ describe('physical inventory', () => {
       //   cy.get('.popover-content input[value="Search"]').click({force: true})
       // })
 
+      // add reason
+      // eslint-disable-next-line max-len
+      cy.get('input[ng-model="lineItem.quantity"]').first().type(parseInt(Math.random().toFixed(4) * 10000), {force: true}).wait(500)
+        .blur()
+        .then(() => {
+          cy.get('input[ng-model="lineItem.reasonFreeText"]').first().type('random comments', {force: true})
+          cy.get('button[ng-click="stockReasonsCtrl.openModal()"]').first().click({force: true}).then(() => {
+            cy.get('.modal-dialog').click(68, 110).then(() => {
+              cy.get('ul.select2-results__options>li').first().click()
+              cy.get('.modal-body input[ng-model="vm.quantity"]').type('0', {force: true})
+              cy.get('.modal-body button.add').click({force: true})
+              cy.get('.modal-footer button[type="submit"]').click({force: true})
+            })
+
+          })
+        })
+
       // add product
       cy.get('button[ng-click="vm.addProducts()"]').click().wait(1000).then(() => {
         cy.get('.modal-dialog').click(68, 100).then(() => {
@@ -146,22 +163,6 @@ describe('physical inventory', () => {
   }
 
   const fillLots = () => {
-    // eslint-disable-next-line max-len
-    cy.get('input[ng-model="lineItem.quantity"]').first().type(parseInt(Math.random().toFixed(4) * 10000), {force: true}).wait(500)
-      .blur()
-      .then(() => {
-        cy.get('input[ng-model="lineItem.reasonFreeText"]').first().type('random comments', {force: true})
-        cy.get('button[ng-click="stockReasonsCtrl.openModal()"]').first().click({force: true}).then(() => {
-          cy.get('.modal-dialog').click(68, 110).then(() => {
-            cy.get('ul.select2-results__options>li').first().click()
-            cy.get('.modal-body input[ng-model="vm.quantity"]').type('0', {force: true})
-            cy.get('.modal-body button.add').click({force: true})
-            cy.get('.modal-footer button[type="submit"]').click({force: true})
-          })
-
-        })
-      })
-
     // add lot by input
     cy.get('button[ng-click="vm.addLot(lineItems[0])"]').eq(0).focus().click({force: true})
       .then(() => {
