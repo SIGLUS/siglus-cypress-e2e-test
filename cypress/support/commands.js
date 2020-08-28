@@ -161,7 +161,7 @@ Cypress.Commands.add('submitAndShowSoh', (isPhysicalInventory) => {
       if (isPhysicalInventory) {
         cy.contains('Physical Inventory has successfully been submitted', {timeout: 120000})
       } else {
-        cy.wait(5000).contains('has successfully been submitted')
+        // cy.wait(5000).contains('has successfully been submitted')
       }
       cy.get('.breadcrumb > :nth-child(1) > .ng-binding').should('contain', 'Home')
       cy.get('.breadcrumb > :nth-child(2) > .ng-binding').should('contain', 'Stock Management')
