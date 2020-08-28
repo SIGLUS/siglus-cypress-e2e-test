@@ -4,7 +4,7 @@ describe('physical inventory', () => {
   })
 
   afterEach(() => {
-    cy.logout()
+    // cy.logout()
   })
 
   it('Physical inventory save', () => {
@@ -45,28 +45,47 @@ describe('physical inventory', () => {
 
       cy.get('.progress-bar-container .progress-bar>span').then(el => expect(el.text()).equal('0%'))
 
-      // filter
-      // cy.get('button.filters').click({force:true}).then(() => {
-      //   cy.get('#searchFor')
-      //   .type('Artemeter+Lumefantrina; 120mg+20mg 1x6; Comp')
-      //   cy.get('.popover-content input[value="Search"]').click({force: true})
-      // })
+      Cypress.on('uncaught:exception', (err, runnable) => {
+        // returning false here prevents Cypress from
+        // failing the test
+        return false
+      })
+
+      // // filter
+      cy.get('button.filters').click({force: true}).then(() => {
+        cy.get('#searchFor')
+          .type('Artemeter+Lumefantrina; 120mg+20mg 1x6; Comp')
+        cy.get('.popover-content input[value="Search"]').click({force: true})
+      })
+
+      cy.get('table tbody>tr>td:nth-child(2)').then(elements => {
+        elements.each((index, el) => {
+          const productName = el.innerHTML.trim()
+          if (productName) {
+            expect(productName.indexOf('Artemeter+Lumefantrina; 120mg+20mg 1x6; Comp')).to.be.greaterThan(-1)
+          }
+        })
+      })
+
+      cy.get('button.filters').click({force: true}).then(() => {
+        cy.get('#searchFor')
+          .clear()
+        cy.get('.popover-content input[value="Search"]').click({force: true})
+      })
 
       // add reason
       // eslint-disable-next-line max-len
       cy.get('input[ng-model="lineItem.quantity"]').first().type(parseInt(Math.random().toFixed(4) * 10000), {force: true}).wait(500)
         .blur()
+        .wait(500)
         .then(() => {
           cy.get('input[ng-model="lineItem.reasonFreeText"]').first().type('random comments', {force: true})
-          cy.get('button[ng-click="stockReasonsCtrl.openModal()"]').first().click({force: true}).then(() => {
-            cy.get('.modal-dialog').click(68, 110).then(() => {
-              cy.get('ul.select2-results__options>li').first().click()
-              cy.get('.modal-body input[ng-model="vm.quantity"]').type('0', {force: true})
-              cy.get('.modal-body button.add').click({force: true})
-              cy.get('.modal-footer button[type="submit"]').click({force: true})
-            })
-
-          })
+          // cy.get('button.reasons.edit[ng-click="stockReasonsCtrl.openModal()"]').first().click({force:true})
+          // .wait(1000).then(() => {
+          //   cy.get('.modal-content').click(68, 120, {force: true}).then(() => {
+          //     selectReason()
+          //   })
+          // })
         })
 
       // add product
@@ -89,10 +108,7 @@ describe('physical inventory', () => {
 
       cy.get('button.danger[ng-click="vm.removeLot(lineItem)"]').focus().wait(1000).click({force: true})
 
-      cy.get('button[ng-click="vm.saveDraft()"]').click()
-
-      // fill soh what already have
-      // fillPageDataSoh()
+      cy.get('button[ng-click="vm.saveDraft()"]').click().wait(10000)
 
     })
 
@@ -193,5 +209,12 @@ describe('physical inventory', () => {
           })
         })
       })
+  }
+
+  const selectReason = () => {
+    cy.get('ul.select2-results__options>li').first().click({force: true})
+    cy.get('.modal-body input[ng-model="vm.quantity"]').type('0', {force: true})
+    cy.get('.modal-body button.add').click({force: true})
+    cy.get('.modal-footer button[type="submit"]').click({force: true})
   }
 })
