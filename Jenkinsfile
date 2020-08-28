@@ -3,6 +3,9 @@ pipeline {
     options {
         buildDiscarder(logRotator(numToKeepStr: '50'))
     }
+    triggers {
+        cron('30 11 * * *')
+    }
     stages {
         stage('Install npm') {
             when {
