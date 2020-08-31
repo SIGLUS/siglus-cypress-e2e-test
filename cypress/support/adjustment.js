@@ -1,8 +1,18 @@
 const addProduct = (productName) => {
   return cy.get('#select2-productSelect-container').click().then(() => {
-    cy.get('.select2-search__field').type(productName).type('{enter}')
-    cy.get('button.add').click()
+    return cy.get('.select2-search__field').type(productName).type('{enter}')
+  }).then(() => {
+    return cy.get('#select2-productSelect-container')
   })
+    .then(($productSelect) => {
+      if ($productSelect.text().includes('archived')) {
+        return cy.get('button.add').click().then(() => {
+          cy.contains('You have added an archived product', {timeout: 10000})
+          cy.contains('button', 'Close', {timeout: 10000}).click()
+        })
+      }
+      return cy.get('button.add').click()
+    })
 }
 
 const fillAdjustmentLineItem = (lineItemIdx, reason, comment, documentNo, increaseQty) => {
@@ -23,7 +33,11 @@ const fillAdjustmentLineItem = (lineItemIdx, reason, comment, documentNo, increa
 }
 
 Cypress.Commands.add('adjustmentOutProduct', (productName) => {
-  addProduct(productName).then(() => {
+  return cy.goToNavigation(['Stock Management', 'Adjustments']).then(() => {
+    return cy.enterAllProductsClearDraft('Adjustments')
+  }).then(() => {
+    return addProduct(productName)
+  }).then(() => {
     cy.get('input.custom-item-container').focus()
     cy.get('body>.adjustment-custom-item .option-list>div').each(($div, index) => {
       if (index) {
@@ -38,7 +52,11 @@ Cypress.Commands.add('adjustmentOutProduct', (productName) => {
 })
 
 Cypress.Commands.add('adjustmentProduct', (productName, increaseQty) => {
-  addProduct(productName).then(() => {
+  return cy.goToNavigation(['Stock Management', 'Adjustments']).then(() => {
+    return cy.enterAllProductsClearDraft('Adjustments')
+  }).then(() => {
+    return addProduct(productName)
+  }).then(() => {
     fillAdjustmentLineItem(0, 'Positive Correction', 'adjust increase qty', 'doc', increaseQty)
   })
 })

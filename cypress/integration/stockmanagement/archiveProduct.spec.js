@@ -22,23 +22,25 @@ describe('Archive product', function() {
       let program = 'Multiple Programs'
       let productName = 'Gonadotrofina coriónica humana5000UI/mLInjectável'
       let productCode = '04E010'
-      cy.isStockOut(program, productCode).then((isStockOut) => {
+      cy.isActivatedProduct(program, productName).then((isActivated) => {
+        if (isActivated) {
+          return cy.isStockOut(program, productCode)
+        }
+        return cy.activateProduct(program, productName, productCode).then(() => {
+          return true
+        })
+      }).then((isStockOut) => {
         if (isStockOut) {
-          return cy.goToNavigation(['Stock Management', 'Adjustments']).then(() => {
-            return cy.enterAllProductsClearDraft('Adjustments')
-          }).then(() => {
-            return cy.adjustmentProduct(productName, 1)
-          }).then(() => {
+          return cy.adjustmentProduct(productName, 1).then(() => {
             return cy.submitAndShowSoh()
           })
             .then(() => {
               return cy.viewProductByProduct(productCode)
             })
         }
+      }).then(() => {
+        cy.get('button', {timeout: 10000}).should('not.contain', 'Archive')
       })
-        .then(() => {
-          cy.get('button', {timeout: 10000}).should('not.contain', 'Archive')
-        })
     })
   })
 
@@ -51,17 +53,38 @@ describe('Archive product', function() {
   })
 
   describe('Activate product', () => {
-    it('Should archive product when product SOH is 0 and is not in kit', () => {
+    it('Should activate product when product SOH is 0 and is not in kit in archived page', () => {
       let program = 'ARV'
       let productName = 'Zidovudina/Lamivudina/Nevirapina; 150mg+300mg+200mg 60Cps; Embalagem'
       let productCode = '08S42'
       cy.isArchivedProduct(program, productName).then((isArchived) => {
         if (!isArchived) {
-          return cy.archiveProduct(program, productName, productCode)
+          return cy.archiveProductWithSOH(program, productName, productCode)
         }
       }).then(() => {
         cy.activateProduct(program, productName, productCode)
       })
+    })
+
+    it('Should auto activate product in adjustment', () => {
+      let program = 'ARV'
+      let productName = 'Abacavir (ABC)+Lamivudina (3TC); 600mg+300mg, 30Comp; Embalagem'
+      let productCode = '08S01ZY'
+      cy.isArchivedProduct(program, productName).then((isArchived) => {
+        if (!isArchived) {
+          return cy.archiveProductWithSOH(program, productName, productCode)
+        }
+      }).then(() => {
+        cy.adjustmentProduct(productName, 1)
+      }).then(() => {
+        return cy.submitAndShowSoh()
+      })
+        .then(() => {
+          return cy.isActivatedProduct(program, productName)
+        })
+        .then((isActivated) => {
+          assert.isTrue(isActivated, 'activated success')
+        })
     })
   })
 })
