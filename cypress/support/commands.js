@@ -121,9 +121,14 @@ Cypress.Commands.add('enterAllProductsClearDraft', (menuName) => {
 Cypress.Commands.add('goToNavigation', (navigation = []) => {
   cy.get('[bs-dropdown="dropdown"]').contains(navigation[0]).click({force: true}).then(() => {
     if (navigation[1]) {
-      cy.get('a').contains(navigation[1]).click({force: true})
+      return cy.get('a').contains(navigation[1]).click({force: true})
     }
   })
+    .then(() => {
+      if (navigation[1]) {
+        return cy.contains('openlmis-breadcrumbs', navigation[1], {timeout: 10000})
+      }
+    })
 })
 
 // fill common data(for issue, receive, adjustments)
@@ -180,22 +185,24 @@ Cypress.Commands.add('viewProductByLot', (productCode, lotCode, movementQuality)
 
 function searchProduct(productCode, lotcode, movementQuality) {
   let haveSearched = false
-  cy.get('table tbody>tr').then(elements => {
+  cy.get('table tbody>tr', {timeout: 10000}).then(elements => {
     elements.toArray().forEach(row => {
       let rows = row.querySelectorAll('td')
       if (rows.item(0).innerHTML.includes(productCode)
-        && rows.item(2).innerHTML.includes(lotcode)
-        && !haveSearched) {
+          && rows.item(2).innerHTML.includes(lotcode)
+          && !haveSearched) {
         cy.log('xiu' + row.querySelector('td').innerHTML)
         haveSearched = true
         cy.log(row.querySelector('button'))
         row.querySelector('button').click({force: true})
-        cy.wait(5000).then(() => {
-          cy.get('tbody > :nth-child(1) > :nth-child(5)').then(elements => {
-            cy.log('search elements' + elements.text())
-            expect(elements.text()).equal(movementQuality)
+        if (movementQuality !== undefined) {
+          cy.wait(5000).then(() => {
+            cy.get('tbody > :nth-child(1) > :nth-child(5)').then(elements => {
+              cy.log('search elements' + elements.text())
+              expect(elements.text()).equal(movementQuality)
+            })
           })
-        })
+        }
       }
     })
 
@@ -218,3 +225,4 @@ function goNextPage(element, searchProductFunc) {
     })
   }
 }
+
