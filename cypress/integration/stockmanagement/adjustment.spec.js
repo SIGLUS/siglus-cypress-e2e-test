@@ -5,15 +5,11 @@ import {KIT, IBUPROFENO, HIDRALAZINA, PRODUCTS} from '../../utils/prodcut-consta
 
 describe('stockmanagement adjustment scenario', () => {
 
-  before(() => {
+  beforeEach(() => {
     cy.login(Cypress.env('username'), Cypress.env('password'))
   })
 
-  after(() => {
-    cy.logout()
-  })
-
-  it('stockmanagement adjustment', () => {
+  it('stockmanagement positive adjustment', () => {
     // go to adjustment page
     cy.enterMenu(4, 5, 'Adjustments', 'stockmanagement/adjustment').then(() => {
       cy.enterAllProductsClearDraft('Adjustments')
@@ -25,28 +21,30 @@ describe('stockmanagement adjustment scenario', () => {
       cy.get('#select2-productSelect-container').click().then(() => {
         cy.get('.select2-search__field').type(product).type('{enter}')
         cy.get('.add').click()
-        if (product !== KIT) {
-          if (product === IBUPROFENO) {
-            // fill 'Lot Code', create new lot
-            // fill 'Expiry Date'
-            cy.get(':nth-child(1) > :nth-child(4) > .input-control').type(getFutureDate())
-            cy.get('[ng-if="enableInput"] > .input-control')
-              .click().then(() => {
-                cy.contains('Auto generate lot').click({force: true})
+        if (product === KIT) {
+          cy.get(':nth-child(1) > :nth-child(3) > .stock-select-container > [ng-if="!enableInput"] > .form-control')
+            .should('not.exist')
+          cy.get(':nth-child(1) > :nth-child(4) > .input-control').should('not.exist')
+        } else if (product === IBUPROFENO) {
+          // fill 'Lot Code', create new lot
+          // fill 'Expiry Date'
+          cy.get(':nth-child(1) > :nth-child(4) > .input-control').type(getFutureDate())
+          cy.get('[ng-if="enableInput"] > .input-control')
+            .click().then(() => {
+              cy.contains('Auto generate lot').click({force: true})
+            })
+        } else if (product === HIDRALAZINA) {
+          // fill 'Lot Code', use existed lot
+          cy.get('.custom-item-container').eq(0).click().wait(1000)
+            .then(() => {
+              cy.get('.adjustment-custom-item .option-list').then(() => {
+                cy.get('body>.adjustment-custom-item .option-list').children().eq(0).click()
               })
-          } else if (product === HIDRALAZINA) {
-            // fill 'Lot Code', use existed lot
-            cy.get('.custom-item-container').eq(0).click().wait(1000)
-              .then(() => {
-                cy.get('.adjustment-custom-item .option-list').then(() => {
-                  cy.get('body>.adjustment-custom-item .option-list').children().eq(0).click()
-                })
-              })
-          } else {
-            // fill 'Lot Code', input lot
-            cy.get('.custom-item-container').eq(0).type('new lot')
-            cy.get(':nth-child(1) > :nth-child(4) > .input-control').type(getFutureDate())
-          }
+            })
+        } else {
+          // fill 'Lot Code', input lot
+          cy.get('.custom-item-container').eq(0).type('new lot')
+          cy.get(':nth-child(1) > :nth-child(4) > .input-control').type(getFutureDate())
         }
       })
       cy.get(':nth-child(1) > :nth-child(6) > .input-control').click().then(() => {
@@ -87,7 +85,9 @@ describe('stockmanagement adjustment scenario', () => {
 
     cy.submitAndShowSoh()
     cy.viewProductByProduct('01C02', '1')
+  })
 
+  it('stockmanagement negative adjustment', () => {
     cy.enterMenu(4, 5, 'Adjustments', 'stockmanagement/adjustment').then(() => {
       cy.enterAllProductsClearDraft('Adjustments')
     })
@@ -97,7 +97,11 @@ describe('stockmanagement adjustment scenario', () => {
       cy.get('#select2-productSelect-container').click().then(() => {
         cy.get('.select2-search__field').type(product).type('{enter}')
         cy.get('.add').click()
-        if (product !== KIT) {
+        if (product === KIT) {
+          cy.get(':nth-child(1) > :nth-child(3) > .stock-select-container > [ng-if="!enableInput"] > .form-control')
+            .should('not.exist')
+          cy.get(':nth-child(1) > :nth-child(4) > .input-control').should('not.exist')
+        } else {
           // fill 'Lot Code', use existed lot
           cy.get('.custom-item-container').eq(0).click().wait(1000)
             .then(() => {

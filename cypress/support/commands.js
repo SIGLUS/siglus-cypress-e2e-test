@@ -196,7 +196,7 @@ function searchProduct(productCode, lotcode, movementQuality) {
         cy.log(row.querySelector('button'))
         row.querySelector('button').click({force: true})
         if (movementQuality !== undefined) {
-          cy.wait(5000).then(() => {
+          cy.wait(10000).then(() => {
             cy.get('tbody > :nth-child(1) > :nth-child(5)').then(elements => {
               cy.log('search elements' + elements.text())
               expect(elements.text()).equal(movementQuality)
