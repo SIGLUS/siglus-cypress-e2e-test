@@ -28,7 +28,7 @@ const fillAdjustmentLineItem = (lineItemIdx, reason, comment, documentNo, increa
       cy.get('table tbody>tr td:nth-child(5)').eq(lineItemIdx).then(($soh) => {
         cy.get('input[name=\'lineItem.quantity\']').eq(lineItemIdx).type(Number($soh.text()) + (increaseQty || 0))
       })
-      cy.get('input[name=\'lineItem.documentationNo\']').eq(lineItemIdx).type(documentNo)
+      cy.get('input[name=\'lineItem.documentationNo\']').eq(lineItemIdx).type(documentNo, {force: true})
     })
 }
 

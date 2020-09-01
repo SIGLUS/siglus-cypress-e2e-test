@@ -42,6 +42,26 @@ describe('Archive product', function() {
         cy.get('button', {timeout: 10000}).should('not.contain', 'Archive')
       })
     })
+
+    it('Should not show archive product button in lot detail page when product SOH is 0', () => {
+      let program = 'ARV'
+      let productName = 'Estavudina/Lamivudina/Nevirapina; 200+150+30mg 60Comp; Embalagem'
+      let productCode = '08S36'
+      cy.isActivatedProduct(program, productName).then((isActivated) => {
+        if (isActivated) {
+          return cy.stockOutWithSOH(program, productName, productCode).then(() => {
+            return cy.goToNavigation(['Stock Management', 'Stock on Hand'])
+          }).then(() => {
+            return cy.selectProgram(program)
+          })
+        }
+        return cy.activateProduct(program, productName, productCode)
+      }).then(() => {
+        cy.viewProductByLot(productCode, 'SEM-LOTE-08S36-092020-0')
+      }).then(() => {
+        cy.get('button', {timeout: 10000}).should('not.contain', 'Archive')
+      })
+    })
   })
 
   describe('Archive product', () => {
@@ -63,7 +83,12 @@ describe('Archive product', function() {
         }
       }).then(() => {
         cy.activateProduct(program, productName, productCode)
+      }).then(() => {
+        return cy.isActivatedProduct(program, productName)
       })
+        .then((isActivated) => {
+          assert.isTrue(isActivated, 'activated success')
+        })
     })
 
     it('Should auto activate product in adjustment', () => {
@@ -84,6 +109,12 @@ describe('Archive product', function() {
         })
         .then((isActivated) => {
           assert.isTrue(isActivated, 'activated success')
+        })
+        .then(() => {
+          return cy.isArchivedProduct(program, productName)
+        })
+        .then((isArchived) => {
+          assert.isFalse(isArchived, 'Not a archive product')
         })
     })
   })
