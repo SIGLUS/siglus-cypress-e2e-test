@@ -30,14 +30,15 @@ describe('stockmanagement receive scenario', () => {
         cy.get(':nth-child(1) > :nth-child(3) > .stock-select-container > [ng-if="!enableInput"] > .form-control').should('not.exist')
         // 'Expiry Date' should be empty
         cy.get(':nth-child(1) > :nth-child(4) > .input-control').should('not.exist')
-      } else if (product === IBUPROFENO) {
-        // fill 'Lot Code', create new lot
+        // } else if (product === IBUPROFENO) {
+        //   // fill 'Lot Code', create new lot
+        //   // eslint-disable-next-line max-len
         // eslint-disable-next-line max-len
-        cy.get(':nth-child(1) > :nth-child(3) > .stock-select-container > [ng-if="!enableInput"] > .form-control').click().then(() => {
-          cy.contains('Auto generate lot').click({force: true})
-        })
-        // fill 'Expiry Date'
-        cy.get(':nth-child(1) > :nth-child(4) > .input-control').type(getFutureDate())
+        //   cy.get(':nth-child(1) > :nth-child(3) > .stock-select-container > [ng-if="!enableInput"] > .form-control').click().then(() => {
+        //     cy.contains('Auto generate lot').click({force: true})
+        //   })
+        //   // fill 'Expiry Date'
+        //   cy.get(':nth-child(1) > :nth-child(4) > .input-control').type(getFutureDate())
       } else {
         // fill 'Lot Code', use existed lot
         cy.get('.custom-item-container').eq(0).click().wait(1000)
