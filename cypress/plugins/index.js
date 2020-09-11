@@ -1,21 +1,32 @@
-/// <reference types="cypress" />
-// ***********************************************************
-// This example plugins/index.js can be used to load plugins
-//
-// You can change the location of this file or turn off loading
-// the plugins file with the 'pluginsFile' configuration option.
-//
-// You can read more here:
-// https://on.cypress.io/plugins-guide
-// ***********************************************************
+const {Client} = require('pg')
+const fs = require('fs')
+const path = require('path')
 
-// This function is called when a project is opened or re-opened (e.g. due to
-// the project's config changing)
+function queryDb(sqlFilename, config) {
+  const sqlPath = path.resolve(__dirname, `./../fixtures/${sqlFilename}`)
 
-/**
- * @type {Cypress.PluginConfig}
- */
+  if (!fs.existsSync(sqlPath)) {
+    return Promise.reject(new Error(`The sql file ${sqlPath} does not exist!`))
+  }
+
+  const client = new Client(config.env.db)
+  const query = fs.readFileSync(sqlPath, 'utf8')
+
+  client.connect()
+
+  return new Promise((resolve, reject) =>
+    client.query(query, (err, res) => {
+      if (err) {
+        return reject(err)
+      }
+      client.end()
+      return resolve(res)
+    })
+  )
+}
+
 module.exports = (on, config) => {
-  // `on` is used to hook into various events Cypress emits
-  // `config` is the resolved Cypress config
+  on('task', {
+    queryDb: query => queryDb(query, config)
+  })
 }

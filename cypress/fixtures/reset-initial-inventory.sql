@@ -1,0 +1,7 @@
+delete from stockmanagement.calculated_stocks_on_hand where stockcardid in (select id from stockmanagement.stock_cards where facilityid = '75da7208-cfcf-11e9-9535-0242ac130005');
+delete from stockmanagement.physical_inventory_line_item_adjustments where stockcardlineitemid in (select id from stockmanagement.stock_card_line_items where stockcardid in (select id from stockmanagement.stock_cards where facilityid = '75da7208-cfcf-11e9-9535-0242ac130005'));
+delete from stockmanagement.stock_card_line_items where stockcardid in (select id from stockmanagement.stock_cards where facilityid = '75da7208-cfcf-11e9-9535-0242ac130005');
+delete from stockmanagement.stock_cards where facilityid = '75da7208-cfcf-11e9-9535-0242ac130005';
+delete from stockmanagement.physical_inventory_line_item_adjustments where physicalinventorylineitemid in (select id from stockmanagement.physical_inventory_line_items where physicalinventoryid in (select id from stockmanagement.physical_inventories where facilityid = '75da7208-cfcf-11e9-9535-0242ac130005'));
+delete from stockmanagement.physical_inventory_line_items where physicalinventoryid in (select id from stockmanagement.physical_inventories where facilityid = '75da7208-cfcf-11e9-9535-0242ac130005');
+delete from stockmanagement.physical_inventories where facilityid = '75da7208-cfcf-11e9-9535-0242ac130005';
