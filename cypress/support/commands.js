@@ -146,6 +146,12 @@ Cypress.Commands.add('fillCommonData', (quantity, date, documentationNo) => {
   cy.get(':nth-child(1) > :nth-child(9) > .input-control').click().type(documentationNo)
 })
 
+// fill qty and data for unpack
+Cypress.Commands.add('fillQuantiy', (quantity) => {
+  // fill 'Quantity'
+  cy.get(':nth-child(1) > :nth-child(6) > .input-control').type(quantity)
+})
+
 // submit and show soh(for issue, receive, adjustments)
 Cypress.Commands.add('submitAndShowSoh', (isPhysicalInventory) => {
   // click 'Submit' button
