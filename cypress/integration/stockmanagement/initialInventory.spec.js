@@ -39,7 +39,7 @@ describe('The initial inventory scenario', () => {
   })
 
   it('should update product and update lot and submit the draft', () => {
-    let originalProductCount;
+    let originalProductCount
 
     cy.get('.modal-footer .primary').click().wait(12000)
     cy.get('.openlmis-flex-table.ps-container th').contains('Product Code').should('be.visible')
@@ -50,7 +50,7 @@ describe('The initial inventory scenario', () => {
     cy.get('.openlmis-flex-table.ps-container th').contains('Actions').should('be.visible')
     cy.get('.progress-bar-container .progress-bar>span').contains('0%').should('be.visible')
     cy.get('.progress-bar-container span[ng-bind="vm.title"]').each(
-        e => originalProductCount = getProductCount(e.text())
+      e => originalProductCount = getProductCount(e.text())
     )
 
     // add product
