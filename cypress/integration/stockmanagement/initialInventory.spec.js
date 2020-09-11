@@ -9,7 +9,7 @@ describe('The initial inventory scenario', () => {
 
   after(() => {
     cy.task('queryDb', 'reset-initial-inventory.sql')
-      .then(console.log, console.error)
+      .then(cy.log, cy.log)
   })
 
   Cypress.on('uncaught:exception', (err, runnable) => false)
