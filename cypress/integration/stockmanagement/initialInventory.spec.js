@@ -23,12 +23,23 @@ describe('The initial inventory scenario', () => {
 
   it('should check the basic product and delete the draft', () => {
     let displayedBasicProducts = []
+    const getBasicProducts = () => {
+      cy.get('.openlmis-flex-table.ps-container').find('td:nth-child(1).ng-binding').each(
+        e => displayedBasicProducts.push(e.text())
+      )
+      cy.get('.openlmis-pagination ul>li:last-child').then(
+        e => goNextPage(e[0], getBasicProducts)
+      )
+    }
 
     cy.get('.modal-footer .primary').click().wait(12000)
     cy.url().should('contain', '/initialInventory')
     cy.get('h2.ng-binding').should('contain', 'All Products')
     cy.get('.openlmis-flex-table.ps-container').find('td:nth-child(1).ng-binding').each(
       e => displayedBasicProducts.push(e.text())
+    )
+    cy.get('.openlmis-pagination ul>li:last-child').then(
+      e => goNextPage(e[0], getBasicProducts)
     )
     cy.fixture('basic-products-qa.json').then(
       qaBasicProducts => expect(displayedBasicProducts.sort()).to.deep.equal(qaBasicProducts.sort())
@@ -89,6 +100,18 @@ describe('The initial inventory scenario', () => {
     // fill current stock
     cy.get('input[name="lineItem.quantity"]').each(e => cy.wrap(e).clear({force: true}).type(2, {force: true}))
 
+    // go next page
+    const fillNextPage = () => {
+      cy.fillCustomInput()
+      cy.get('input[name="lineItem.quantity"]').each(e => cy.wrap(e).clear({force: true}).type(2, {force: true}))
+      cy.get('.openlmis-pagination ul>li:last-child').then(
+        e => goNextPage(e[0], fillNextPage)
+      )
+    }
+    cy.get('.openlmis-pagination ul>li:last-child').then(
+      e => goNextPage(e[0], fillNextPage)
+    )
+
     // remove lot and remove product
     cy.get('button.danger[ng-click="vm.removeLot(lineItem)"]').last().click({force: true})
     cy.get('.progress-bar-container span[ng-bind="vm.title"]').each(
@@ -104,4 +127,12 @@ describe('The initial inventory scenario', () => {
 
   // progress text like '0 of 7 products completed'
   const getProductCount = progressText => parseInt(progressText.substring(progressText.indexOf('of') + 3))
+  const goNextPage = (element, callback) => {
+    if (element.classList.contains('disabled')) {
+    } else {
+      cy.get('[ng-class="{disabled : pagination.isLastPage()}"] > .ng-binding').click().wait(5000).then(() => {
+        callback()
+      })
+    }
+  }
 })
