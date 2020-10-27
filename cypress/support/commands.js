@@ -189,6 +189,49 @@ Cypress.Commands.add('viewProductByLot', (productCode, lotCode, movementQuality)
   searchProduct(productCode, lotCode, movementQuality)
 })
 
+//enrance unpack detail page and Click 'Unpack' button
+Cypress.Commands.add('enterAndCliskUnpack', (kitName, quantity, documentText) => {
+  cy.get(':nth-child(4) > [bs-dropdown="dropdown"]')
+    .click()
+    .then(() => {
+      cy.contains('Unpack')
+        .click()
+      cy.url()
+        .should('contain', 'stockmanagement/unpack')
+      cy.contains('Kit Unpack for')
+        .should('be.visible')
+
+      //get KIT AL/US (Artemeter+Lumefantrina); 170 Tratamentos+ 400 Testes; KIT and Unpack
+      cy.contains(kitName)
+        .should('contain', 'KIT')
+        .should('contain', 'US')
+        .parent('tr')
+        .within(() => {
+          cy.get('td')
+            .eq(1)
+            .should(($div) => {
+              const n = parseFloat($div.text())
+              expect(n)
+                .to
+                .be
+                .gte(1)
+            })
+          cy.get('td', {timeout: 15000})
+            .eq(2)
+            .click()
+        })
+
+      cy.url()
+        .should('include', '/create')
+      cy.get('tbody > .ng-isolate-scope > :nth-child(2)')
+        .should('contain', kitName)
+      cy.get(':nth-child(4) > .input-control')
+        .type(quantity)
+      cy.get(':nth-child(5) > .input-control')
+        .type(documentText)
+    })
+})
+
 function searchProduct(productCode, lotcode, movementQuality) {
   let haveSearched = false
   cy.get('table tbody>tr', {timeout: 10000}).then(elements => {

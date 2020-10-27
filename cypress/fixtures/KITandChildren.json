@@ -1,0 +1,29 @@
+{
+  "children": [
+    {
+      "code": "08O05",
+      "productName": "Artemeter+Lumefantrina; 120mg+20mg 1x6; Comp",
+      "quantity": 30
+    },
+    {
+      "code": "08O05X",
+      "productName": "Artemeter+Lumefantrina; 120mg+20mg 4x6; Comp",
+      "quantity": 30
+    },
+    {
+      "code": "08O05Y",
+      "productName": "Artemeter+Lumefantrina; 120mg+20mg 3x6; Comp",
+      "quantity": 10
+    },
+    {
+      "code": "08O05Z",
+      "productName": "Artemeter+Lumefantrina; 120mg+20mg 2x6; Comp",
+      "quantity": 15
+    },
+    {
+      "code": "22A08",
+      "productName": "TDR de Malaria; kit de 25; Tests",
+      "quantity": 7
+    }
+  ]
+}
